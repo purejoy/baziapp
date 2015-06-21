@@ -637,11 +637,3 @@ class bazi:
         return mark_safe('\n'.join(output))
 
 
-
-'''
-xjpdt = datetime.datetime(1953,6,15,2,30)
-xjpbz = bazi(xjpdt,1,1,108,9)
-xjpbz.Paipan()
-print xjpbz.Solar2Lunar(xjpdt)
-'''
-
