@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block active %}
+<li><a href="/bazi">四柱信息</a></li>
+<li><a href="/about">关于</a></li>
+<li><a href="/contact">开发相关</a></li>
+{% endblock %}
+
+{% block xmmeta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+{% endblock %}
+{% block mainbody %}
+<div class="alert alert-danger fade in">
+	  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>出错了！</strong>
+    <p>所访问的页面找不到了!</p>
+    <p>Page Not Found!</p>
+</div>
+{% endblock %}

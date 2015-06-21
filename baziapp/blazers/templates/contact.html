@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block xmmeta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+{% endblock %}
+
+{% block active %}
+<li><a href="/bazi">四柱信息</a></li>
+<li><a href="/about">关于</a></li>
+<li class="active"><a href="/contact">开发相关</a></li>
+{% endblock %}
+
+
+{% block mainbody %}
+<div class="text-muted">
+<h5>主要使用的一些开源项目</h5>
+<ul>
+    <li>许剑伟---<a href="http://www.fjptsz.com/xxjs/xjw/rj/115.htm">寿星万年历</a></li>
+    <li>django@<span class="fa fa-github"></span>---<a href ="https://www.djangoproject.com/">django</a></li>
+    <li>niklasvh@<span class="fa fa-github"></span>---<a href="http://html2canvas.hertzen.com/">html2canvs</a></li>
+    <li>Mark&amp;Jacob@<span class="fa fa-twitter"></span>---<a href="http://getbootstrap.com/bootstrap">Bootstrap</a></li>
+    <li>eonasdan@<span class="fa fa-github"></span>---<a href="https://eonasdan.github.io/bootstrap-datetimepicker/">bootstrap-datetimepicker</a></li>
+    <li>mozillazg@<span class="fa fa-github"></span>---<a href="http://pyqr.sinaapp.com/">PYQR</a></li>
+</ul>
+</div>
+
+<div class="text-muted">
+    <h5>更新日志:</h5>
+    <ul>
+        <li>04-20:<code>PureJOY@SAE</code>版本1.0，用户可通过发送固定格式的微信文本消息查询八字排盘。用查表法计算农历和节气交接日期。</li>
+        <li>05-05:<code>PureJOY@SAE</code>版本2.0，使用寿星万年历1.0的天文算法，计算农历和节气交接日期和时间用于排盘。</li>
+        <li>05-28:<code>BaziAPP@SAE</code>版本1.0 alpha_1,改用django重新搭建应用，重新设计UI，移植PureJOY 2.0排盘算法。</li>
+        <li>06-04:<code>BaziAPP@SAE</code>版本1.0 alpha_2,修复起运时间判断分支，流年计算起点的错误，修复窄屏手机显示的一些问题。</li>
+        <li>06-11:<code>BaziAPP@SAE</code>版本1.0 alpha_3,添加真太阳时排盘，平气法排盘，夏令时排盘等功能、修复一些小的bug,局部调整UI。</li>
+        <li>06-12:<code>BaziAPP@SAE</code>版本1.0 alpha_3,修复闰年二月份以后日干少一天、农历闰月不显示、平气法下半月月柱计算错误。</li>
+        <li>06-13:<code>BaziAPP@SAE</code>版本1.0 alpha_3,修复12月份冬至以后各天农历月份计算出错，排盘格式局部调整,微信分享链接格式调整。</li>
+	<li>06-21:<code>BaziAPP@SAE</code>版本1.0 alpha_4，使用寿星历5.05测试版天文算法替代之前1.0版算法进行节气定气计算，修改使用平气拟合参数计算节气交接时间的算法与寿星历5.05的古历历谱的数据保持一致，其他bug修复。</li>
+    </ul>
+</div>
+
+<div class="text-muted">
+  <h5>代码贡献</h5>
+  <p>本应用目前处于活跃开发状态，1.0版将公开测试一段时间，目前bug较多，待源码稳定后将上传Github开放源码，欢迎有兴趣的朋友一起加入开发。</p>
+  <ul class="nav">
+    <li>
+      <span class="fa fa-paper-plane"><a href="mailto:chaycechen@gmail.com??subject=四柱排盘">&nbsp;&nbsp;写邮件给我</a></span>
+      &nbsp;&nbsp;
+      &nbsp;&nbsp;purejoy@<span class="fa fa-github"></span>  
+      &nbsp;&nbsp;
+      &nbsp;&nbsp;小呆da大喜@<span class="fa fa-weixin"></span>   
+   	</li>  
+ </ul>
+</div>
+{% endblock %}
+
+	{% block rightnavbar %}
+	<h6 class="text-muted" align="center">微信扫描二维码在手机上排盘或在微信中常桉二维码图片选择与他人分享</h6>
+	<img  class="img-responsive" src="/static/qr.png" alt="Chania">
+	{% endblock %}
+

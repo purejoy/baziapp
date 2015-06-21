@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+  <title>简易四柱排盘</title>
+  {% block xmmeta %}
+  {% endblock %}
+
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+  <style type="text/css">
+    body {
+      padding-top: 80px;
+      padding-bottom: 40px;
+    }
+      
+  {% block cssheader %}
+  {% endblock %}
+      
+  </style>
+  <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/static/css/style.css" type="text/css" >
+  <!-- <link rel="stylesheet" href="/static/css/app.css" type="text/css" > -->
+  <link rel="stylesheet" href="/static/css/glyphicons.css" type="text/css" >
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  {% block excssheaders %}
+  {% endblock %}
+
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>	
+
+  {% block exjsheaders %}
+  {% endblock %}
+  
+  {% block wxheader %}
+  {% endblock %}
+
+</head>
+
+<body>
+  <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/bazi"><span class="icon-nameplate"></span>简易四柱排盘</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+	    {% block active %}
+
+	    {% endblock %}
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+  </div><!-- /.navbar -->   
+
+
+ 
+  
+ 
+  <div class="container">
+    <div class="row row-offcanvas row-offcanvas-right">
+      <div class="col-xs-12 col-sm-9 col-md-6">
+	
+	{% block mainbody %}{% endblock %}
+	
+	<div class="mg"></div>
+      </div><!--/span-->
+
+      <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="sidebar-nav">
+	  <ul class="nav">
+	    <li class="active">
+
+	      {% block rightnavbar %}{% endblock %}
+	      
+
+	    </li>
+	  </ul>
+	</div><!--/.well -->
+      </div><!--/span-->
+      
+    </div><!--/row-->
+  </div><!--/.container-->
+
+
+</body>
+</html>

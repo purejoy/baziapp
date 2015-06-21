@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+
+{% block xmmeta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+{% endblock %}
+
+{% block active %}
+<li><a href="/bazi">四柱信息</a></li>
+<li class="active" ><a href="/about">关于</a></li>
+<li><a href="/contact">开发相关</a></li>
+{% endblock %}
+
+{% block mainbody %}
+<div class="text-muted">
+    <p>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本应用（<code>BaziAPP@SAE</code>)为之前另一个<code>SAE</code>排盘应用的衍生，目的在利用微信的<code>JS-SDK</code>，二维码，经纬度查询等相关API接口丰富功能，增强多设备环境下用户体验，同时也改善UI设计。
+    </p>
+    
+	<p> 注意事项:
+  <ul>
+    <li>计算各年份节气交接时间和各月合朔的具体时间时使用了许剑伟先生寿星天文历5.05测试版和1.0版本中的算法，某些时间和主要使用的<a href="http://www.fjptsz.com/xxjs/xjw/rj/115.htm">寿星天文历2009-V4.32</a>可能有数秒钟到数分钟的误差。</li><br/>
+    <li>计算不同经度地区真太阳时使用了许剑伟先生寿星天文历5.05测试版中的算法,经度的获取直接使用了百度地图的API接口。</li><br/>
+    <li>平气法排盘时使用的拟合参数使用了许剑伟先生寿星天文历源码中给出的历法拟合参数K和b,由于古历法都有各自的使用时限，节气交接时间的计算结果和定气法有比较大的出入，建议只用来排盘历法相应时代的四柱。</li><br/>
+    <li>应用中使用了其他一些API接口，例如微信<code>JS-SDK</code>和<code>PYQR</code>二维码生成接口,都使用的测试号，有一定的时限和功能限制，不保证其他机构或开发者能够一直提供所需接口。</li><br/>
+    <li>本应用不会强制用户提供姓名、出生地址等个人隐私，排盘结果中抹去查询经度时输入的地址信息，只保留经度信息供使用者比对参考.</li><br/>
+    <li>本应用的功能、排盘信息只供个人研究参考和娱乐，切勿用于其他非法用途，如因此而引起的纠葛，与应用开发者无关.</li><br/>
+  </ul>
+    <p/>
+</div>
+{% endblock %}
+
+
+	{% block rightnavbar %}
+	<h6 class="text-muted" align="center">微信扫描二维码在手机上排盘或在微信中常桉二维码图片选择与他人分享</h6>
+	<img  class="img-responsive" src="/static/qr.png" alt="Chania">
+	{% endblock %}

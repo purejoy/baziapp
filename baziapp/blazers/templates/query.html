@@ -1,0 +1,353 @@
+
+{% extends "base.html" %}
+
+
+{% block xmmeta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+{% endblock %}
+
+  {% block excssheaders %}
+  <link rel="stylesheet" href="/static/css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/d004434a5ff76e7b97c8b07c01f34ca69e635d97/build/css/bootstrap-datetimepicker.css" >
+  <link href="/static/css/bootstrap-toggle.min.css" rel="stylesheet">
+  {% endblock %}
+
+
+  {% block exjsheaders %}
+  <script src="/static/js/bootstrap-select.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
+  <!--<script src="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/d004434a5ff76e7b97c8b07c01f34ca69e635d97/src/js/bootstrap-datetimepicker.js"></script> -->
+  <script src="/static/js/bootstrap-datetimepicker.js"></script>
+  <script src="/static/js/bootstrap-toggle.min.js"></script>
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>
+  {% endblock %}
+
+{% block wxheader %}
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script>
+
+      
+     wx.config({
+      debug: false, 
+      appId: '此处填写自己的appid', 
+      timestamp: {{timestamp}}, 
+      nonceStr: '{{noncestr}}', 
+      signature: '{{signature}}',
+      jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage', 'previewImage']
+      });
+     
+      wx.ready(function () {
+      
+       
+      wx.checkJsApi({
+        jsApiList: [
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage'
+        ]
+      });
+
+      
+      wx.onMenuShareAppMessage({
+	        title:'分享一个可以在线排八字的Web应用',
+	    	link:'http://baziapp.sinaapp.com/bazi/',
+          	imgUrl:'http://baziapp.sinaapp.com/static/hsqs.jpg',
+          	desc:'排盘可以截图也可以生成二维码分享，快来用用看',
+	        type:'link', //指定分享类型
+      });
+
+      
+      wx.onMenuShareTimeline({
+	      	title:'分享一个可以在线排八字的Web应用',
+	    	link:'http://baziapp.sinaapp.com/bazi/',
+            imgUrl:'http://baziapp.sinaapp.com/static/hsqs.jpg',
+	        success:function(){	
+	        	alert("success");
+	        }
+      });
+      
+      wx.error(function (res) {
+	        alert('wx.error: '+JSON.stringify(res));
+      });
+              
+      });
+    </script>
+{% endblock %}
+
+
+
+
+    {% block active %}
+    <li class="active"><a href="/bazi">四柱信息</a></li>
+    <li><a href="/about">关于</a></li>
+    <li><a href="/contact">开发相关</a></li>
+    {% endblock %}
+
+
+
+    {% block mainbody %}
+        <div class="alert alert-info fade in" id="info-alert">
+           	<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <small>
+            <p>使用提示</p>
+            <p>请依次输入性别、出生日期和时间，然后点击排盘。出生日期和时间通过点击相应图标打开控件进行输入，目前设置可查询1800年1月1日至2100年1月1日之间的生辰八字。</p>
+            <p>默认设置排盘方法采用现代农历定气法计算交节气交接时间，出生地经度为东经120&deg;，如需自行设置参数可开启相关选项。</p>
+            <p><span id="cdtime"> 15 </span> 秒后自动关闭，有关本应用的更多信息可<a href=/about>点击这里查看</a></p>
+            </small>
+	</div>
+	<script type="text/javascript">
+	    function startTimer(duration, display) {
+	        var timer = duration;
+	        setInterval(function () {
+                    display.textContent = timer;
+                    if (--timer < 0) {
+                        timer = duration;
+                    }
+                }, 1000);
+            }
+
+            window.onload = function () {
+                var cd = 14,
+                display = document.querySelector('#cdtime');
+                startTimer(cd, display);
+            };
+	  
+            $("#info-alert").fadeTo(15000, 500).slideUp(500, function(){
+            $("#info-alert").alert('close');
+	    });
+	</script>
+
+        <form action="" method="get" role="form">
+          {% for field in form.visible_fields %}
+          <div id="div_{{ field.html_name }}" 
+               class="form-group{% if field.errors %} has-error{% endif %}">
+            {{ field.label_tag }}
+            {{ field }}
+            <div class="text-muted pull-right">
+              <small>{{ field.help_text }}</small>
+            </div>
+            <div class="help-block">
+              {{ field.errors }}
+            </div>
+          </div>
+          {% endfor %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+          {% csrf_token %}
+
+
+	  <div id="addrlon" class="collapse">
+	    <label for="id_time">出生地经度</label>
+            <div class="input-group address" id="lonlat">
+              <span class="input-group-addon">
+                <span class="fa fa-globe"></span>
+              </span>
+              <input readonly="" value="120" type="text" id="id_lonlat" name="lonlat" class="form-control"/>		  
+            </div>
+	    <br/>
+	    
+	    <div class="panel-group" id="accordion">
+	    <div class="panel panel-default">
+	    <div class="panel-heading">
+	      <h4 class="panel-title">
+		<a data-toggle="collapse" data-parent="#accordion" 
+		   href="#minimap" >
+		  <small>不知道出生地的经度，请点击这里获取</small>
+		</a>
+	      </h4>
+	    </div>
+
+		
+	    <div id="minimap" class="panel-collapse collapse">
+	      <div class="panel-body">
+		<div style="display:table; margin:0 auto; width:88%;height:240px;border:1px solid gray" id="container" >
+		</div>
+		<h6 align="center" class="text-muted" >在下面输入详细出生地址,然后从打开的区域地图中拾取出生地准确经度自动补全</h6>
+		<div class="input-group address" id="address">
+		  <span class="input-group-addon">
+		    <span class="fa fa-street-view"></span>
+		  </span>
+		  <input type="text" id="id_address" name="address" class="form-control"/>		  
+		</div>
+		<script>
+		  document.getElementById("id_address").addEventListener("keypress", myFunction);
+
+		  function myFunction(event) {
+		  var x = event.which || event.keyCode;
+		  if ( x == 13) {
+              //event.preventDefault();
+		  sear(document.getElementById('id_address').value);
+		  }
+		  }
+
+		</script>
+		<br/>
+		&nbsp;&nbsp;&nbsp;
+		<input type="button" id="expandmap" value="获取出生地区域地图" class="btn btn-primary pull-center" onClick="sear(document.getElementById('id_address').value);"  />
+	      </div>
+	    </div>  
+	  </div>
+            <script type="text/javascript">
+	      var map = new BMap.Map("container");//在指定的容器内创建地图实例
+	      map.setDefaultCursor("crosshair");//设置地图默认的鼠标指针样式
+	      map.enableScrollWheelZoom();//启用滚轮放大缩小，默认禁用。
+	      map.centerAndZoom(new BMap.Point(120.0,30.0), 7);
+	      map.addControl(new BMap.NavigationControl()); 
+	      map.addEventListener("click", function(e){//地图单击事件
+	      document.getElementById("id_lonlat").value = e.point.lng;
+	      });
+	      function iploac(result){//根据IP设置地图中心
+	      var cityName = result.name;
+	      map.setCenter(cityName);
+	      }
+	      var myCity = new BMap.LocalCity();
+	      myCity.get(iploac);
+	      function sear(result){//地图搜索
+	      var local = new BMap.LocalSearch(map, {
+  		renderOptions:{map: map}
+	      });
+	      local.search(result);
+	      }
+            </script>
+
+	    </div>
+	  </div>
+
+	  <div id="div_lifa" class="form-group collapse">
+	    <label for="id_lifa">古代历法选择</label>
+	    <div  class="input-group select">
+	      &nbsp;&nbsp;&nbsp;&nbsp;
+	      <span>
+		<span class="fa fa-history"></span>
+	      </span>
+	      &nbsp;
+	      <select id="lifa" name="lifa" class="selectpicker">
+		<option value="9" data-subtext="元史.律历志">郭守敬授时历</option>
+		<option value="8">淳祐历</option>
+		<option value="7" data-subtext="宋史.律历志">崇天历</option>
+		<option value="6" data-subtext="宋史.律历志">应天历</option>
+		<option value="5" data-subtext="新唐书.历志">正元历</option>
+		<option value="4" data-subtext="新唐书.历志">麟德历</option>
+		<option value="3" data-subtext="新唐书.历志">戊寅元历</option>
+		<option value="2" data-subtext="宋书.历志">祖冲之大明历</option>
+		<option value="1" data-subtext="后汉书.律历志">四分历</option>
+		<option value="0" data-subtext="汉书.历志">太初历</option>
+	      </select>
+	    </div>
+	  </div>
+          <script type="text/javascript">
+	    $(function(){$("#lifa").selectpicker({"size": 8});});
+	  </script>
+
+	  <div id="div_xialing" class="form-group collapse">
+	    <label for="id_xl">何为夏令时?</label>
+	    <div>
+	      <small>
+	      <p>
+		由于夏天日间时间长，为了节约能源和充分利用日间时间，有些国家和地区每到夏天就将本地区时间拨快一小时；到了冬天，由于冬天日间时间短，到了冬天就将本地区时间拨慢一小时，这种法定时间方法称为<mark>夏令时间</mark>。
+	      </p>
+	      <p>
+		我国解放前几年在部分地区也曾实行过夏令时。1986年4月，中央有关部门发出“在全国范围内实行夏时制的通知”，具体作法是：每年从四月中旬第一个星期日的凌晨2时整（北京时间），将时钟拨快一小时，即将表针由2时拨至3时，夏令时开始；到九月中旬第一个星期日的凌晨2时整（北京夏令时），再将时钟拨回一小时，即将表针由2时拨至1时，夏令时结束。从1986年到1991年的六个年度，除1986年因是实行夏时制的第一年，从5月4日开始到9月14日结束外，其它年份均按规定的时段施行。1992年起，夏令时暂停实行。
+	      </p>
+	    
+           	中国大陆实行情况（<a href= https://zh.wikipedia.org/wiki/%E5%A4%8F%E6%97%B6%E5%88%B6#.C2.A0.E4.B8.AD.E8.8F.AF.E6.B0.91.E5.9C.8B>资料来源维基百科-夏令时</a>）:
+              <br/>
+			中华民国时期
+		<ul>
+		  <li>1945年05月01日至09月30日</li>
+		  <li>1946年05月15日至09月30日</li>
+		  <li>1947年04月15日至10月31日 </li>
+		  <li>1948年05月01日至09月30日 </li>
+		  <li>1949年05月01日至09月30日 </li>
+		</ul>
+		中华人民共和国时期
+		<ul>
+		  <li> 1986年05月04日至09月14日 </li>
+		  <li> 1987年04月12日至09月13日 </li>
+		  <li> 1988年04月10日至09月11日 </li>
+		  <li> 1989年04月16日至09月17日 </li>
+		  <li> 1990年04月15日至09月16日 </li>
+		  <li> 1991年04月14日至09月15日 </li>
+		</ul>
+           
+      
+
+	      </small>
+	    </div>
+	  </div>
+	  
+	  <div id="div_opts" class="form-group">
+            <label for="opts">其他选项</label>
+          <div style="margin-left:6%">
+              <table class="text-muted">
+                  <tr>
+                      <td>
+						真太阳时&nbsp;&nbsp;&nbsp;&nbsp;
+						<br/>&nbsp;&nbsp;	
+                      </td>
+                      <td>
+                         <input id="toggle-zty" name="ztytoggle" type="checkbox"  autocomplete="off" data-on="开" data-off="关" data-toggle="toggle collapse" data-size="small" >	
+                         <br/>&nbsp;&nbsp;
+                      </td>
+                      <td>
+						&nbsp;&nbsp;&nbsp;&nbsp;平气法排盘&nbsp;&nbsp;&nbsp;&nbsp;
+                        <br/>&nbsp;&nbsp;
+                      </td>
+                      <td>
+                          <input id="toggle-lifa" name="pqtoggle" type="checkbox"  autocomplete="off" data-on="开" data-off="关" data-toggle="toggle collapse" data-size="small"  >
+                          <br/>&nbsp;&nbsp;
+                      </td>
+                  </tr>
+
+                  <tr>
+
+                      <td class="pull-right">
+						夏令时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </td>
+                      <td>
+                          <input id="toggle-xialing" name="xltoggle" type="checkbox"  autocomplete="off" data-on="开" data-off="关" data-toggle="toggle collapse" data-size="small" >
+                      </td>
+                  </tr>
+             </table>
+	    </div>
+	    <script>
+	      $(function() {
+	      $('#toggle-lifa').change(function() {
+	      $('#div_lifa').collapse('toggle')
+	      })
+	      })
+
+	      $(function() {
+	      $('#toggle-zty').change(function() {
+	      
+	      $('#minimap').collapse('hide');
+	      $('#addrlon').collapse('toggle');
+	      
+	      })
+	      })
+
+
+	      $(function() {
+	      $('#toggle-xialing').change(function() {
+	      $('#div_xialing').collapse('toggle')
+	      })
+	      })
+	    </script>
+	  </div>
+	  
+	  <hr/>
+	  
+          <div class="form-group">
+	    &nbsp;&nbsp;&nbsp;
+            <input type="submit" value="排盘" class="btn btn-success" />
+          </div>
+	  
+        </form>
+	{% endblock %}
+
+
+	{% block rightnavbar %}
+	<h6 class="text-muted" align="center">微信扫描二维码在手机上排盘或在微信中常桉二维码图片选择与他人分享</h6>
+	<!-- <img  class="img-responsive" src="http://pyqr.sinaapp.com/qr?chl=http://baziapp.sinaapp.com/query&chs=350x350&chld=M" alt="Chania"> -->
+	<img  class="img-responsive" src="/static/qr.png" alt="Chania">
+	{% endblock %}

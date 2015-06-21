@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block xmmeta %}
+<meta name="viewport" content="width=device-width, initial-scale=0.9">  
+{% endblock %}
+
+{% block active %}
+<li class="active"><a href="/bazi">四柱信息</a></li>
+<li><a href="/about">关于</a></li>
+<li><a href="/contact">开发相关</a></li>
+{% endblock %}
+
+{% block cssheader %}
+.alert {
+   width:100%;    
+}
+
+#down_button,#share_button
+{
+    display: none;
+}
+
+
+.mg
+{
+    margin-bottom: 40px;
+}
+
+.no-select
+{
+   user-select: none;
+   -o-user-select:none;
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+}
+
+{% endblock %}
+
+  {% block exjsheaders %}
+  <script src="/static/js/html2canvas.js"></script>
+  <!-- <script src="/static/js/app.js"></script> -->
+  {% endblock %}
+
+{% block wxheader %}
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript">
+     wx.config({
+      debug: false, 
+      appId: '此处填写自己的appid', 
+      timestamp: {{timestamp}}, 
+      nonceStr: '{{noncestr}}', 
+      signature: '{{signature}}',
+      jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage', 'previewImage']
+      });
+     
+      wx.ready(function () {
+      
+       
+      wx.checkJsApi({
+        jsApiList: [
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage'
+        ]
+      });
+
+      
+      wx.onMenuShareAppMessage({
+	        title:'大师，瞧瞧这个八字！',
+	    	link:'http://baziapp.sinaapp.com/qrquery/?{{qrargs}}',
+            imgUrl:'http://purejoy.sinaapp.com/img.jpg',
+            desc:'{{baziinst.Get8zi}}',
+	        type:'link', //指定分享类型
+      });
+
+      
+      wx.onMenuShareTimeline({
+	      	title:'大师，瞧瞧这个八字！',
+	    	link:'http://baziapp.sinaapp.com/qrquery/?{{qrargs}}',
+            imgUrl:'http://purejoy,sinaapp.com/img.jpg',
+	        success:function(){	
+	        	alert("success");
+	        }
+      });
+      
+      wx.error(function (res) {
+	        alert('wx.error: '+JSON.stringify(res));
+      });
+              
+      });
+    </script>
+{% endblock %}
+
+{% block mainbody %}
+
+<div id="bazilist" style="width:490px" >
+  <div class="alert alert-info" id="bazi-alert">
+    <p>
+      {% if ztytoggle %}<span class="fa fa-check-square"></span>&nbsp;&nbsp;出生地真太阳时 {% else %} <span class="fa fa-check-square"></span>&nbsp;&nbsp;UTC+8标准时 {% endif %}
+      &nbsp;&nbsp;&nbsp;
+      {% if pqtoggle %} <span class="fa fa-check-square"></span>&nbsp;&nbsp;平气法 {% else %} <span class="fa fa-check-square"></span>&nbsp;&nbsp;现代农历定气法 {% endif %}
+      &nbsp;&nbsp;&nbsp;
+      {% if xltoggle %} <span class="fa fa-check-square"></span>&nbsp;&nbsp;夏令时 {% endif %}
+    </p>
+    {% if pqtoggle %}
+    <p>定气方式 {{ baziinst.print_lifa }} </p>
+    {% endif %}
+    <p>公历生日 {{ baziinst.print_mst }} </p>
+    <p>农历生日 {{ baziinst.print_lunar }} </p>
+    <p>命主{{ baziinst.print_age }} </p>
+
+    {% if ztytoggle %}
+    {{ baziinst.render_ast }}
+    {% endif %}
+    {{ baziinst.render_solarterms }}
+    
+    
+	   <br/>
+	   <table  class="text-nowrap">
+	     <tr>
+	       {{ baziinst.render_bazi }}
+	     </tr>	
+	   </table>
+	   <br/><br/>
+	   <table  class="text-nowrap">
+	     <tr>
+	       {{ baziinst.render_dayun }}
+	     </tr>	
+	   </table>  
+	</div>
+</div>
+<div style="width:490px" >
+    <p class="exp text-nowrap">
+    <i class="fa fa-wechat"></i><small class="text-muted">&nbsp;用户用微信内置浏览器无法下载截图，需要用其他浏览器打开下载。</small><br/>
+    <i class="fa fa-html5"></i><small class="text-muted">&nbsp;&nbsp;需良好支援<code>HTML5</code>的浏览器来下载截图，如Chrome,Firefox,Safari,IE9+</small><br/>
+    <i class="fa fa-android"></i><small class="text-muted">&nbsp;&nbsp;用户无法在微信内预览和直接分享截图，可以在系统浏览器中下载截图。</small><br/>
+    <i class="fa fa-apple"></i><small class="text-muted">&nbsp;&nbsp;用户可在微信内正常预览并直接分享保存截图</small>
+  	</p>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+	 <a type="button" class="btn btn-success" onclick="print($('#down_button'))">截图</a> &nbsp;
+	 <a type="button" class="btn btn-success" id="down_button">下载截图</a>
+	 <a type="button" class="btn btn-primary" id="share_button">微信预览分享</a>
+	 <script>
+	 function print(link)
+	   {
+	   html2canvas( $('#bazilist') , 
+	   {
+                background :'#FFFFFF',
+  		onrendered: function(canvas) 
+  		{
+    		//document.body.appendChild(canvas);
+    		$('#down_button').attr( 'href' , canvas.toDataURL() ) ;
+    		$('#down_button').attr( 'download' , '{{filename}}.png' ) ;
+    		$('#down_button').css('display','inline-block');
+
+    		$('#share_button').css('display','inline-block');
+    		$('#share_button').on( 'click' , function()
+    		{
+		          wx.previewImage({
+			      current: canvas.toDataURL(),
+			      urls: [canvas.toDataURL(),]
+			  	  });
+    		} );
+  		}
+  	   });
+           } 
+	 </script>
+</div>
+{% endblock %}
+
+{% block rightnavbar %} 
+	 <h6 class="text-muted" align="center">微信扫描二维码访问此八字排盘信息或常桉二维码图片选择与他人分享</h6>
+	 <img  class="img-responsive" src="http://pyqr.sinaapp.com/qr?chl=http://baziapp.sinaapp.com/qrquery/?{{qrargs}}&chs=350x350&chld=M" alt="Chania">
+{% endblock %}
+
